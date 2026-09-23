@@ -52,7 +52,7 @@ export default function AdminDashboard() {
       {/* ── Page heading ── */}
       <div>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f1f5f9', margin: '0 0 4px', letterSpacing: '-0.025em' }}>
-          MAU Admin Control Center
+          Mekdela Amba University Admin Control Center
         </h1>
         <p style={{ fontSize: '0.875rem', color: '#64748b', margin: 0 }}>
           Manage all employees, control department attendance, configure system settings, send notifications,

@@ -2,8 +2,10 @@ const jwt  = require('jsonwebtoken');
 const User = require('../models/User');
 const { findBestMatch } = require('../utils/faceMatcher');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'smart-attendance-dev-secret-change-me';
+
 const signToken = (id, role) =>
-  jwt.sign({ id, role }, process.env.JWT_SECRET, {
+  jwt.sign({ id, role }, JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   });
 

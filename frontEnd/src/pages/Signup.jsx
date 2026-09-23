@@ -376,12 +376,31 @@ function Field({ label, name, value, onChange, type = 'text', required }) {
       <label htmlFor={uid} className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
         {label}{required && <span className="text-red-400 ml-0.5">*</span>}
       </label>
-      <input id={uid} name={uid}
-        type={type === 'email' ? 'text' : type}
+      <input id={uid} name={name}
+        type={type}
         inputMode={type === 'email' ? 'email' : undefined}
         autoComplete="off" value={value} required={required}
         onChange={e => onChange({ target: { name, value: e.target.value } })}
         className={inputBase} />
+    </div>
+  );
+}
+
+function SelectField({ label, name, value, onChange, options = [], required }) {
+  const uid = `su_${name}`;
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={uid} className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+        {label}{required && <span className="text-red-400 ml-0.5">*</span>}
+      </label>
+      <select id={uid} name={name} value={value} required={required}
+        onChange={e => onChange({ target: { name, value: e.target.value } })}
+        className={inputBase}>
+        <option value="">Select an option</option>
+        {options.map(option => (
+          <option key={option} value={option}>{option}</option>
+        ))}
+      </select>
     </div>
   );
 }
@@ -394,7 +413,7 @@ function PasswordField({ label, name, value, onChange, show, toggle, required })
         {label}{required && <span className="text-red-400 ml-0.5">*</span>}
       </label>
       <div className="relative">
-        <input id={uid} name={uid} type={show ? 'text' : 'password'}
+        <input id={uid} name={name} type={show ? 'text' : 'password'}
           autoComplete="new-password" value={value} required={required}
           onChange={e => onChange({ target: { name, value: e.target.value } })}
           className={inputBase + ' pr-10'} />

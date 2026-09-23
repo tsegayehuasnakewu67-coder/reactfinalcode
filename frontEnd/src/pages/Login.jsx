@@ -564,7 +564,7 @@ export default function Login() {
           <div className="login-logo" aria-hidden="true">
             <img className="login-logo-image" src="/mau-logo.svg" alt="" />
           </div>
-          <h1 className="login-app-name">Mekdela Abba University</h1>
+          <h1 className="login-app-name">Mekdela Amba University</h1>
           <p className="login-app-sub">Smart Attendance System</p>
         </div>
 

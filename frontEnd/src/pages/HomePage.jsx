@@ -386,11 +386,24 @@ export default function HomePage() {
       box-shadow: 0 20px 70px rgba(2, 8, 23, 0.64);
       color: #facc15;
       animation: logoFloat 4s ease-in-out infinite;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .hero-logo-image {
+      width: 74px;
+      height: 74px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 4px;
+      filter: drop-shadow(0 8px 18px rgba(250, 204, 21, 0.25));
     }
 
     .hero-logo-badge strong {
-      font-size: 2.35rem;
+      display: block;
+      font-size: 2.1rem;
       letter-spacing: 0.12em;
+      line-height: 1;
       margin-left: 0.12em;
     }
 
@@ -888,7 +901,7 @@ export default function HomePage() {
                 <img className="brand-logo-image" src="/mau-logo.svg" alt="" />
               </div>
               <div className="brand-copy">
-                <h2>Mekdela Abba University</h2>
+                <h2>Mekdela Amba University</h2>
                 <small>Smart Workforce</small>
               </div>
             </div>
@@ -902,14 +915,14 @@ export default function HomePage() {
 
             <div className="header-actions">
               <Link to="/login" className="ghost-btn">Login</Link>
-              <Link to="/signup" className="primary-btn">Register <ArrowRight size={16} /></Link>
+              <Link to="/register" className="primary-btn">Register <ArrowRight size={16} /></Link>
             </div>
           </header>
 
           <main className="hero" id="home">
             <div className="hero-content">
               <span className="eyebrow">
-                <Sparkles size={12} /> MEKDELA ABBA UNIVERSITY
+                <Sparkles size={12} /> MEKDELA AMBA UNIVERSITY
               </span>
 
               <h1>
@@ -925,8 +938,8 @@ export default function HomePage() {
               </p>
 
               <div className="hero-actions">
-                <Link to="/login" className="primary-btn">Get Started <ArrowRight size={16} /></Link>
-                <Link to="/signup" className="ghost-btn">Create Account</Link>
+                <Link to="/register" className="primary-btn">Get Started <ArrowRight size={16} /></Link>
+                <Link to="/register" className="ghost-btn">Create Account</Link>
               </div>
 
               <div className="stats-grid">
@@ -948,8 +961,9 @@ export default function HomePage() {
             <div className="visual-card" aria-label="Workplace attendance overview">
               <div className="visual-frame">
                 <div className="visual-overlay" />
-                <div className="hero-logo-center" aria-label="Mekdela Abba University logo">
+                <div className="hero-logo-center" aria-label="Mekdela Amba University logo">
                   <div className="hero-logo-badge">
+                    <img className="hero-logo-image" src="/mau-logo.svg" alt="Mekdela Amba University logo" />
                     <div>
                       <strong>MAU</strong>
                       <small>UNIVERSITY</small>
@@ -1092,7 +1106,7 @@ export default function HomePage() {
                     <img className="brand-logo-image" src="/mau-logo.svg" alt="" />
                   </div>
                   <div className="brand-copy">
-                    <h2>Mekdela Abba University</h2>
+                    <h2>Mekdela Amba University</h2>
                     <small>Smart Workforce</small>
                   </div>
                 </div>
@@ -1106,7 +1120,7 @@ export default function HomePage() {
               </div>
 
               <div className="footer-copy">
-                © 2026 Mekdela Abba University Attendance.<br />
+                © 2026 Mekdela Amba University Attendance.<br />
                 All rights reserved.
               </div>
             </div>

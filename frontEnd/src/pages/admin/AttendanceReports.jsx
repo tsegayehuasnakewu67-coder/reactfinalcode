@@ -79,7 +79,7 @@ function printAnalyticsPdf(data, filters) {
   if (!reportWindow) return;
   reportWindow.document.write(`<!doctype html><html><head><title>MAU Attendance Report</title>
     <style>body{font-family:Arial,sans-serif;color:#172033;padding:32px}h1{margin:0 0 8px;color:#123c78}p{color:#526178}table{width:100%;border-collapse:collapse;margin-top:24px}th,td{border:1px solid #d8e0eb;padding:10px;text-align:left;font-size:12px}th{background:#123c78;color:#fff}tr:nth-child(even){background:#f4f7fb}.meta{display:flex;gap:28px;flex-wrap:wrap}</style>
-    </head><body><h1>Mekdela Abba University</h1><h2>Attendance Report</h2>
+    </head><body><h1>Mekdela Amba University</h1><h2>Attendance Report</h2>
     <div class="meta"><p><strong>Period:</strong> ${data?.periodStart || ''} to ${data?.periodEnd || ''}</p>
     <p><strong>Department:</strong> ${filters.department || 'All departments'}</p><p><strong>Employees:</strong> ${data?.employees?.length || 0}</p></div>
     <table><thead><tr><th>Employee</th><th>ID</th><th>Department</th><th>Present</th><th>Late</th><th>Absent</th><th>Attendance</th><th>Late Time</th></tr></thead><tbody>${rows}</tbody></table>

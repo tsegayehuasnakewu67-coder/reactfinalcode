@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 const adminLinks = [
   { to: '/admin',           label: '📊 Dashboard' },
   { to: '/admin/users',     label: '👥 Employees' },
+  { to: '/admin/logs',      label: '📝 Attendance Lists' },
   { to: '/admin/reports',   label: '📋 Attendance Reports' },
   { to: '/admin/settings',  label: '⚙️ System Settings' },
   { to: '/kiosk',           label: '📷 Attendance Set' },

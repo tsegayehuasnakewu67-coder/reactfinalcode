@@ -8,6 +8,7 @@ import {
 const adminNav = [
   { to: '/admin',          icon: LayoutDashboard, label: 'Dashboard'         },
   { to: '/admin/users',    icon: Users,           label: 'Employees'         },
+  { to: '/admin/logs',     icon: ClipboardList,   label: 'Attendance List'   },
   { to: '/admin/reports',  icon: ClipboardList,   label: 'Reports'           },
   { to: '/admin/register', icon: UserPlus,        label: 'Register Employee' },
   { to: '/admin/settings', icon: Settings,        label: 'System Settings'   },
