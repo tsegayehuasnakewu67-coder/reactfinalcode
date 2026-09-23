@@ -259,7 +259,7 @@ export default function HomePage() {
       box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.05);
     }
 
-    .hero h1 {
+    .hero-title {
       margin: 22px 0 18px;
       font-size: clamp(2.8rem, 5vw, 5rem);
       line-height: 0.96;
@@ -268,7 +268,17 @@ export default function HomePage() {
       text-wrap: balance;
     }
 
-    .hero h1 .highlight {
+    .title-line {
+      display: block;
+      opacity: 0;
+      animation: titleReveal 0.72s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    .hero-title .title-line:nth-child(1) { animation-delay: 0.18s; }
+    .hero-title .title-line:nth-child(2) { animation-delay: 0.34s; }
+    .hero-title .title-line:nth-child(3) { animation-delay: 0.5s; }
+
+    .hero-title .highlight {
       display: block;
       background: linear-gradient(135deg, #7dd3fc 0%, #a78bfa 38%, #f9a8d4 100%);
       -webkit-background-clip: text;
@@ -282,6 +292,8 @@ export default function HomePage() {
       line-height: 1.8;
       max-width: 680px;
       text-wrap: pretty;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.5s ease forwards;
     }
 
     .hero-actions {
@@ -289,6 +301,8 @@ export default function HomePage() {
       flex-wrap: wrap;
       gap: 16px;
       margin-top: 30px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.7s ease forwards;
     }
 
     .stats-grid {
@@ -296,6 +310,8 @@ export default function HomePage() {
       grid-template-columns: repeat(3, minmax(120px, 1fr));
       gap: 16px;
       margin-top: 30px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.9s ease forwards;
     }
 
     .stat-box {
@@ -325,6 +341,12 @@ export default function HomePage() {
       font-size: 0.78rem;
       letter-spacing: 0.04em;
       text-transform: uppercase;
+    }
+
+    .visual-stage {
+      opacity: 0;
+      transform: translateY(24px) scale(0.98);
+      animation: imageReveal 0.9s 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     }
 
     .visual-card {
@@ -772,6 +794,39 @@ export default function HomePage() {
       to { opacity: 1; transform: translateY(0); }
     }
 
+    @keyframes titleReveal {
+      from {
+        opacity: 0;
+        transform: translateY(26px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes imageReveal {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
     @keyframes revealLeft {
       from { opacity: 0; transform: translateX(-24px); }
       to { opacity: 1; transform: translateX(0); }
@@ -925,10 +980,10 @@ export default function HomePage() {
                 <Sparkles size={12} /> MEKDELA AMBA UNIVERSITY
               </span>
 
-              <h1>
-                Smart
-                <span className="highlight">attendance for</span>
-                our university community.
+              <h1 className="hero-title">
+                <span className="title-line">Smart</span>
+                <span className="highlight title-line">attendance for</span>
+                <span className="title-line">our university community.</span>
               </h1>
 
               <p className="hero-copy">
@@ -958,34 +1013,36 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="visual-card" aria-label="Workplace attendance overview">
-              <div className="visual-frame">
-                <div className="visual-overlay" />
-                <div className="hero-logo-center" aria-label="Mekdela Amba University logo">
-                  <div className="hero-logo-badge">
-                    <img className="hero-logo-image" src="/mau-logo.svg" alt="Mekdela Amba University logo" />
-                    <div>
-                      <strong>MAU</strong>
-                      <small>UNIVERSITY</small>
+            <div className="visual-stage">
+              <div className="visual-card" aria-label="Workplace attendance overview">
+                <div className="visual-frame">
+                  <div className="visual-overlay" />
+                  <div className="hero-logo-center" aria-label="Mekdela Amba University logo">
+                    <div className="hero-logo-badge">
+                      <img className="hero-logo-image" src="/mau-logo.svg" alt="Mekdela Amba University logo" />
+                      <div>
+                        <strong>MAU</strong>
+                        <small>UNIVERSITY</small>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="mini-panel">
-                  <div className="mini-panel-top">
-                    <span>Attendance Overview</span>
-                    <span className="mini-pill">Live</span>
-                  </div>
-                  <div className="mini-panel-row">
-                    <span>Present</span>
-                    <strong>216</strong>
-                  </div>
-                  <div className="mini-panel-row">
-                    <span>Late</span>
-                    <strong>12</strong>
-                  </div>
-                  <div className="mini-panel-row">
-                    <span>On Leave</span>
-                    <strong>09</strong>
+                  <div className="mini-panel">
+                    <div className="mini-panel-top">
+                      <span>Attendance Overview</span>
+                      <span className="mini-pill">Live</span>
+                    </div>
+                    <div className="mini-panel-row">
+                      <span>Present</span>
+                      <strong>216</strong>
+                    </div>
+                    <div className="mini-panel-row">
+                      <span>Late</span>
+                      <strong>12</strong>
+                    </div>
+                    <div className="mini-panel-row">
+                      <span>On Leave</span>
+                      <strong>09</strong>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1077,7 +1134,7 @@ export default function HomePage() {
                   <Mail size={22} />
                 </div>
                 <h4>Email</h4>
-                <a href="mailto:mausmartattendance@gmail.com">mausmartattendance@gmail.com</a>
+                <a href="mailto:tsegayehu2@gmail.com">tsegayehu2@gmail.com</a>
               </div>
 
               <div className="contact-card">
@@ -1085,7 +1142,7 @@ export default function HomePage() {
                   <PhoneCall size={22} />
                 </div>
                 <h4>Phone</h4>
-                <p>+251 911 234 567</p>
+                <p>+251995207802</p>
               </div>
 
               <div className="contact-card">
@@ -1093,7 +1150,7 @@ export default function HomePage() {
                   <MapPin size={22} />
                 </div>
                 <h4>Location</h4>
-                <p>Addis Ababa, Ethiopia</p>
+                <p>Bahir Dar Gemba, Ethiopia</p>
               </div>
             </div>
           </section>
