@@ -14,7 +14,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userService } from '../../services/userService';
 import Spinner from '../../components/Spinner';
-import { Search, UserPlus, Trash2, Pencil, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Search, UserPlus, Trash2, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 /* ─── critical card style reused in 2 places ─────────────────────────────── */
 const CARD = {
@@ -58,6 +58,15 @@ export default function ManageUsers() {
       fetchUsers(pagination.page);
     } catch (e) { setError(e.message); }
     finally { setDeleting(false); }
+  };
+
+  const changeRole = async (id, role) => {
+    try {
+      await userService.update(id, { role });
+      setUsers(current => current.map(user => user._id === id ? { ...user, role } : user));
+    } catch (e) {
+      setError(e.message);
+    }
   };
 
   return (
@@ -199,7 +208,7 @@ export default function ManageUsers() {
                     key={u._id}
                     u={u}
                     isLast={i === users.length - 1}
-                    onEdit={() => navigate(`/admin/register?edit=${u._id}`)}
+                    onRoleChange={role => changeRole(u._id, role)}
                     onDelete={() => setDeleteId(u._id)}
                   />
                 ))}
@@ -321,7 +330,7 @@ const INPUT_STYLE = {
 
 /* ── Sub-components ──────────────────────────────────────────────────────── */
 
-function TableRow({ u, isLast, onEdit, onDelete }) {
+function TableRow({ u, isLast, onRoleChange, onDelete }) {
   const [hovered, setHovered] = useState(false);
 
   const cellStyle = {
@@ -371,7 +380,18 @@ function TableRow({ u, isLast, onEdit, onDelete }) {
       </td>
 
       {/* Role */}
-      <td style={cellStyle}><RoleBadge role={u.role} /></td>
+      <td style={cellStyle}>
+        <select
+          aria-label={`Role for ${u.fullName}`}
+          value={u.role}
+          onChange={event => onRoleChange(event.target.value)}
+          style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 6, color: '#cbd5e1', padding: '6px 8px', fontSize: 12 }}
+        >
+          <option value="employee">Employee</option>
+          <option value="hr">HR</option>
+          <option value="admin">Admin</option>
+        </select>
+      </td>
 
       {/* Status */}
       <td style={cellStyle}><StatusDot active={u.isActive} /></td>
@@ -379,7 +399,6 @@ function TableRow({ u, isLast, onEdit, onDelete }) {
       {/* Actions */}
       <td style={cellStyle}>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <ActionBtn onClick={onEdit}  title="Edit"   hoverColor="rgba(30,58,138,0.5)"  color="#60a5fa"><Pencil size={13} /></ActionBtn>
           <ActionBtn onClick={onDelete} title="Delete" hoverColor="rgba(127,29,29,0.5)" color="#f87171"><Trash2 size={13} /></ActionBtn>
         </div>
       </td>

@@ -86,7 +86,9 @@ const register = async (req, res) => {
       password,
       department: department.trim(),
       position: position.trim(),
-      role: role === 'admin' ? 'admin' : 'employee',
+      role: req.user.role === 'admin' && ['admin', 'hr', 'employee'].includes(role)
+        ? role
+        : 'employee',
       faceDescriptor: faceDescriptor || [],
     });
 

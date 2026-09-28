@@ -213,12 +213,16 @@ const resolveSessionAction = (record, now, shift) => {
 // ─────────────────────────────────────────────────────────────────────────────
 const markAttendance = async (req, res) => {
   try {
-    const { faceDescriptor } = req.body;
+    const { faceDescriptor, livenessPassed } = req.body;
+    if (livenessPassed !== true) {
+      return res.status(400).json({ success: false, message: 'Complete the live blink check before marking attendance.' });
+    }
     if (!Array.isArray(faceDescriptor) || faceDescriptor.length !== 128) {
       return res.status(400).json({ success: false, message: 'Invalid face descriptor.' });
     }
 
     const employees = await User.find({
+      role: 'employee',
       isActive: true,
       'faceDescriptor.0': { $exists: true },
     }).select('fullName employeeId department position faceDescriptor');
@@ -227,11 +231,13 @@ const markAttendance = async (req, res) => {
       return res.status(404).json({ success: false, message: 'No registered faces found.' });
     }
 
-    const { matched, employee, distance } = findBestMatch(faceDescriptor, employees);
+    const { matched, employee, distance, ambiguous } = findBestMatch(faceDescriptor, employees, 0.5, 0.08);
     if (!matched) {
       return res.status(401).json({
         success: false,
-        message: 'Face not recognised. Contact HR to register your face.',
+        message: ambiguous
+          ? 'Face match is unclear. Make sure only you are in the camera frame and try again.'
+          : 'Face not recognised. Contact HR to register your face.',
       });
     }
 
@@ -483,13 +489,17 @@ const markAttendance = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 const checkOutAttendance = async (req, res) => {
   try {
-    const { faceDescriptor } = req.body;
+    const { faceDescriptor, livenessPassed } = req.body;
+    if (livenessPassed !== true) {
+      return res.status(400).json({ success: false, message: 'Complete the live blink check before checking out.' });
+    }
     if (!Array.isArray(faceDescriptor) || faceDescriptor.length !== 128) {
       return res.status(400).json({ success: false, message: 'Invalid face descriptor.' });
     }
 
     /* ── Face recognition ── */
     const employees = await User.find({
+      role: 'employee',
       isActive: true,
       'faceDescriptor.0': { $exists: true },
     }).select('fullName employeeId department position faceDescriptor');
@@ -498,11 +508,13 @@ const checkOutAttendance = async (req, res) => {
       return res.status(404).json({ success: false, message: 'No registered faces found.' });
     }
 
-    const { matched, employee, distance } = findBestMatch(faceDescriptor, employees);
+    const { matched, employee, distance, ambiguous } = findBestMatch(faceDescriptor, employees, 0.5, 0.08);
     if (!matched) {
       return res.status(401).json({
         success: false,
-        message: 'Face not recognised. Contact HR to register your face.',
+        message: ambiguous
+          ? 'Face match is unclear. Make sure only you are in the camera frame and try again.'
+          : 'Face not recognised. Contact HR to register your face.',
       });
     }
 

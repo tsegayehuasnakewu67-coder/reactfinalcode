@@ -17,23 +17,35 @@ const euclideanDistance = (a, b) => {
  * Find the closest matching employee from a list.
  * @param {number[]} incoming  - 128-element descriptor from live feed
  * @param {Array}    employees - Active employees with faceDescriptor
- * @param {number}   threshold - Default 0.6
- * @returns {{ matched, employee, distance }}
+ * @param {number}   threshold - Maximum accepted distance (default 0.6)
+ * @param {number}   minMargin - Required distance gap from the next-best match
+ * @returns {{ matched, employee, distance, ambiguous }}
  */
-const findBestMatch = (incoming, employees, threshold = 0.6) => {
+const findBestMatch = (incoming, employees, threshold = 0.6, minMargin = 0) => {
   let best = null;
   let bestDist = Infinity;
+  let secondBestDist = Infinity;
 
   for (const emp of employees) {
     if (!emp.faceDescriptor || emp.faceDescriptor.length !== 128) continue;
     const dist = euclideanDistance(incoming, emp.faceDescriptor);
-    if (dist < bestDist) { bestDist = dist; best = emp; }
+    if (dist < bestDist) {
+      secondBestDist = bestDist;
+      bestDist = dist;
+      best = emp;
+    } else if (dist < secondBestDist) {
+      secondBestDist = dist;
+    }
   }
 
-  if (bestDist <= threshold) {
-    return { matched: true, employee: best, distance: bestDist };
-  }
-  return { matched: false, employee: null, distance: bestDist };
+  const ambiguous = bestDist <= threshold && secondBestDist - bestDist < minMargin;
+  const matched = bestDist <= threshold && !ambiguous;
+  return {
+    matched,
+    employee: matched ? best : null,
+    distance: bestDist,
+    ambiguous,
+  };
 };
 
 module.exports = { euclideanDistance, findBestMatch };

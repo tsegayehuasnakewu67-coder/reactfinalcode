@@ -1,8 +1,8 @@
 import api from './api';
 
 export const attendanceService = {
-  mark:           async (faceDescriptor)  => (await api.post('/attendance/mark',         { faceDescriptor })).data,
-  checkout:       async (faceDescriptor)  => (await api.post('/attendance/checkout',     { faceDescriptor })).data,
+  mark:           async (faceDescriptor, livenessPassed)  => (await api.post('/attendance/mark',         { faceDescriptor, livenessPassed })).data,
+  checkout:       async (faceDescriptor, livenessPassed)  => (await api.post('/attendance/checkout',     { faceDescriptor, livenessPassed })).data,
   getKioskStatus: async ()               => (await api.get('/attendance/kiosk-status')).data.data,
   getCompany:     async (params = {})    => (await api.get('/reports',                  { params })).data.data,
   getMine:        async (params = {})    => (await api.get('/attendance/my',            { params })).data.data,

@@ -15,7 +15,7 @@
  * ─────────────────────────────────────────────────────────────────────────
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { loadModels, getDescriptor } from '../utils/faceApi';
+import { loadModels, getLiveFaceScan, getDescriptor } from '../utils/faceApi';
 import { attendanceService } from '../services/attendanceService';
 import {
   Camera, CheckCircle2, XCircle, RefreshCw, Clock,
@@ -146,12 +146,17 @@ export default function MarkAttendance() {
   const [msg,     setMsg]     = useState('');
   const [result,  setResult]  = useState(null);   // raw backend data payload
   const [tick,    setTick]    = useState(new Date());
+  const [livenessStep, setLivenessStep] = useState('open');
 
   const videoRef  = useRef(null);
   const streamRef = useRef(null);
   const scanRef   = useRef(null);
   const resetRef  = useRef(null);
   const modeRef   = useRef(mode);
+  const openEyeFramesRef = useRef(0);
+  const openEyeBaselineRef = useRef(null);
+  const closedEyesRef = useRef(false);
+  const scanBusyRef = useRef(false);
   useEffect(() => { modeRef.current = mode; }, [mode]);
 
   /* ── Live clock ── */
@@ -201,6 +206,11 @@ export default function MarkAttendance() {
   };
 
   const selectMode = m => {
+    openEyeFramesRef.current = 0;
+    openEyeBaselineRef.current = null;
+    closedEyesRef.current = false;
+    scanBusyRef.current = false;
+    setLivenessStep('open');
     setMode(m);
     setMsg('');
     setResult(null);
@@ -210,26 +220,55 @@ export default function MarkAttendance() {
   const beginScanning = () => {
     setPhase(PHASE.SCANNING);
     scanRef.current = setInterval(async () => {
-      if (!videoRef.current) return;
+      if (!videoRef.current || scanBusyRef.current) return;
+      scanBusyRef.current = true;
       try {
-        const descriptor = await getDescriptor(videoRef.current);
-        if (!descriptor) return;   // no face detected yet — keep looping
-        clearInterval(scanRef.current);
-        stopCamera();
-        await submitDescriptor(descriptor);
+        const scan = await getLiveFaceScan(videoRef.current);
+        if (!scan) return;
+
+        const eyeRatio = scan.eyeAspectRatio;
+        const openBaseline = openEyeBaselineRef.current;
+
+        if (closedEyesRef.current) {
+          const reopenThreshold = Math.max(0.12, (openBaseline ?? eyeRatio) * 0.9);
+          if (eyeRatio >= reopenThreshold) {
+            const descriptor = await getDescriptor(videoRef.current);
+            if (!descriptor) {
+              openEyeFramesRef.current = 0;
+              openEyeBaselineRef.current = null;
+              closedEyesRef.current = false;
+              setLivenessStep('open');
+              return;
+            }
+            clearInterval(scanRef.current);
+            stopCamera();
+            setLivenessStep('complete');
+            await submitDescriptor(descriptor, true);
+            return;
+          }
+        } else if (openEyeFramesRef.current >= 2 && openBaseline !== null && eyeRatio <= Math.max(0.08, openBaseline * 0.88)) {
+          closedEyesRef.current = true;
+          setLivenessStep('closed');
+        } else if (eyeRatio >= 0.12) {
+          openEyeBaselineRef.current = openBaseline === null
+            ? eyeRatio
+            : openBaseline * 0.9 + eyeRatio * 0.1;
+          openEyeFramesRef.current += 1;
+        }
       } catch { /* transient frame error — keep scanning */ }
-    }, 1000);
+      finally { scanBusyRef.current = false; }
+    }, 60);
   };
 
   /* ── Submit descriptor to backend ── */
-  const submitDescriptor = async (descriptor) => {
+  const submitDescriptor = async (descriptor, livenessPassed) => {
     try {
       const isCheckIn = modeRef.current === 'checkin';
 
       // Both check-in and check-out hit the same smart endpoint now
       const res = isCheckIn
-        ? await attendanceService.mark(descriptor)
-        : await attendanceService.checkout(descriptor);
+        ? await attendanceService.mark(descriptor, livenessPassed)
+        : await attendanceService.checkout(descriptor, livenessPassed);
 
       const resolvedPhase = resolvePhase(res, isCheckIn);
 
@@ -256,6 +295,7 @@ export default function MarkAttendance() {
     setResult(null);
     setMsg('');
     setMode(null);
+    setLivenessStep('open');
     setPhase(PHASE.IDLE);
   }, []);
 
@@ -398,7 +438,7 @@ export default function MarkAttendance() {
                 color: '#60a5fa',
                 textShadow: '0 1px 6px rgba(0,0,0,0.8)',
               }}>
-                Scanning — align your face
+                {livenessStep === 'open' ? 'Look at the camera, then blink once' : 'Blink detected — open your eyes'}
               </p>
             </div>
           )}

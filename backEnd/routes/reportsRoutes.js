@@ -3,10 +3,10 @@ const {
   getCompanyAttendance,
   getAnalytics,
 } = require('../controllers/attendanceController');
-const { protect, adminOnly } = require('../middleware/authMiddleware');
+const { protect, hrOrAdmin } = require('../middleware/authMiddleware');
 
 router.use(protect);
-router.use(adminOnly);
+router.use(hrOrAdmin);
 
 // GET /api/reports           — daily attendance log (joined department)
 // GET /api/reports/analytics — weekly / monthly / yearly summaries

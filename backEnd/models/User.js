@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
   department: { type: String, required: [true, 'Department required'], trim: true },
   position:   { type: String, required: [true, 'Position required'],   trim: true },
   role: {
-    type: String, enum: ['admin', 'employee'], default: 'employee',
+    type: String, enum: ['admin', 'hr', 'employee'], default: 'employee',
   },
   faceDescriptor: {
     type: [Number], default: [],

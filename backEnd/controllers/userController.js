@@ -14,7 +14,8 @@ const getAllUsers = async (req, res) => {
       ];
     }
     if (department) q.department = { $regex: department, $options: 'i' };
-    if (role)       q.role = role;
+    if (req.user.role === 'hr') q.role = 'employee';
+    else if (role) q.role = role;
     if (isActive !== undefined) q.isActive = isActive === 'true';
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -36,6 +37,9 @@ const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-faceDescriptor');
     if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+    if (req.user.role === 'hr' && user.role !== 'employee') {
+      return res.status(403).json({ success: false, message: 'HR can only view employee accounts.' });
+    }
     if (req.user.role === 'employee' && req.user._id.toString() !== user._id.toString()) {
       return res.status(403).json({ success: false, message: 'Access denied.' });
     }
@@ -51,12 +55,15 @@ const updateUser = async (req, res) => {
     const { fullName, email, department, position, role, isActive, password } = req.body;
     const user = await User.findById(req.params.id).select('+password');
     if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+    if (req.user.role === 'hr' && user.role !== 'employee') {
+      return res.status(403).json({ success: false, message: 'HR can only manage employee accounts.' });
+    }
 
     if (fullName)   user.fullName   = fullName.trim();
     if (email)      user.email      = email.toLowerCase().trim();
     if (department) user.department = department.trim();
     if (position)   user.position   = position.trim();
-    if (role && ['admin', 'employee'].includes(role)) user.role = role;
+    if (req.user.role === 'admin' && role && ['admin', 'hr', 'employee'].includes(role)) user.role = role;
     if (isActive !== undefined) user.isActive = Boolean(isActive);
     if (password) {
       if (password.length < 6) return res.status(400).json({ success: false, message: 'Password min 6 chars.' });
@@ -75,6 +82,9 @@ const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+    if (req.user.role === 'hr' && user.role !== 'employee') {
+      return res.status(403).json({ success: false, message: 'HR can only manage employee accounts.' });
+    }
     if (req.user._id.toString() === user._id.toString()) {
       return res.status(400).json({ success: false, message: 'Cannot delete your own account.' });
     }

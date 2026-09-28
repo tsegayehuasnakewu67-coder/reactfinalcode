@@ -13,13 +13,15 @@ const STYLES = `
     position: relative;
     isolation: isolate;
     min-height: 100vh;
+    min-height: 100svh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 40px 24px 56px;
+    justify-content: safe center;
+    padding: 28px 24px 36px;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     background:
       radial-gradient(circle at 12% 8%, rgba(37, 99, 235, 0.2), transparent 28%),
       radial-gradient(circle at 88% 88%, rgba(250, 204, 21, 0.13), transparent 25%),
@@ -95,20 +97,20 @@ const STYLES = `
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 32px;
+    margin-bottom: 22px;
     text-align: center;
     animation: revealDown 0.7s ease both;
   }
 
   .login-logo {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     border-radius: 16px;
     background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 72%, #2563eb 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 18px;
+    margin-bottom: 12px;
     box-shadow: 0 8px 28px rgba(37, 99, 235, 0.28);
     border: 2px solid rgba(250, 204, 21, 0.8);
     animation: logoPulse 3.5s ease-in-out infinite;
@@ -161,7 +163,7 @@ const STYLES = `
   }
 
   .login-app-name {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: #0F172A;
     letter-spacing: -0.5px;
@@ -184,17 +186,17 @@ const STYLES = `
   .login-card {
     width: 100%;
     max-width: 480px;
-    padding: 3rem;
+    padding: 2.5rem;
     background: rgba(255, 255, 255, 0.84);
     border: 1px solid rgba(255, 255, 255, 0.9);
     border-top: 3px solid #facc15;
-    border-radius: 24px;
+    border-radius: 20px;
     box-shadow: 0 24px 70px rgba(15, 23, 42, 0.14), 0 0 0 8px rgba(255, 255, 255, 0.28);
     backdrop-filter: blur(18px);
     animation: revealUp 0.8s 0.12s ease both;
   }
 
-  .login-card-heading { margin-bottom: 32px; }
+  .login-card-heading { margin-bottom: 24px; }
 
   .login-card-heading h2 {
     font-size: 1.875rem;
@@ -215,11 +217,11 @@ const STYLES = `
   .login-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, #dbeafe, #facc15, transparent);
-    margin-bottom: 28px;
+    margin-bottom: 22px;
   }
 
   /* ── Fields ── */
-  .login-field { margin-bottom: 20px; }
+  .login-field { margin-bottom: 16px; }
 
   .login-label {
     display: block;
@@ -241,7 +243,7 @@ const STYLES = `
 
   .login-input {
     width: 100%;
-    height: 52px;
+    height: 50px;
     padding: 0.875rem 1rem;
     font-size: 15px;
     font-family: inherit;
@@ -324,7 +326,7 @@ const STYLES = `
   /* ── Primary sign-in button ── */
   .login-btn {
     width: 100%;
-    height: 52px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -386,11 +388,11 @@ const STYLES = `
     position: relative;
     width: 100%;
     max-width: 480px;
-    margin-top: 2rem;
+    margin-top: 1.25rem;
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 18px 24px;
+    padding: 16px 20px;
     background: linear-gradient(110deg, rgba(15, 23, 42, 0.97), rgba(30, 64, 175, 0.96));
     border: 1.5px solid rgba(250, 204, 21, 0.5);
     border-radius: 18px;
@@ -502,8 +504,8 @@ const STYLES = `
   }
 
   @media (max-width: 480px) {
-    .login-root { padding: 28px 16px 40px; }
-    .login-card  { padding: 2rem 1.5rem; border-radius: 20px; }
+    .login-root { padding: 24px 16px 32px; }
+    .login-card  { padding: 1.75rem 1.5rem; border-radius: 18px; }
     .kiosk-cta   { padding: 14px 18px; }
     .login-card-heading h2 { font-size: 1.625rem; }
   }
@@ -532,7 +534,7 @@ export default function Login() {
     setLoading(true);
     try {
       const user = await login(form.email.trim(), form.password);
-      navigate(user.role === 'admin' ? '/admin' : '/me', { replace: true });
+      navigate(user.role === 'admin' ? '/admin' : user.role === 'hr' ? '/hr' : '/me', { replace: true });
     } catch (err) {
       setError(
         err?.response?.data?.message ||

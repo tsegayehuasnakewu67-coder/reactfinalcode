@@ -24,14 +24,18 @@ const protect = async (req, res, next) => {
   }
 };
 
-const adminOnly = (req, res, next) => {
-  if (req.user?.role === 'admin') return next();
-  return res.status(403).json({ success: false, message: 'Admin access required.' });
+const hasAnyRole = (user, allowedRoles = []) => !!user && allowedRoles.includes(user.role);
+
+const requireRole = (...allowedRoles) => (req, res, next) => {
+  if (!req.user || !hasAnyRole(req.user, allowedRoles)) {
+    const rolesText = allowedRoles.length > 1 ? allowedRoles.join(' / ') : allowedRoles[0];
+    return res.status(403).json({ success: false, message: `${rolesText} access required.` });
+  }
+  return next();
 };
 
-const employeeOrAdmin = (req, res, next) => {
-  if (req.user?.role === 'admin' || req.user?.role === 'employee') return next();
-  return res.status(403).json({ success: false, message: 'Forbidden.' });
-};
+const adminOnly = requireRole('admin');
+const hrOrAdmin = requireRole('admin', 'hr');
+const employeeOrAdmin = requireRole('admin', 'hr', 'employee');
 
-module.exports = { protect, adminOnly, employeeOrAdmin };
+module.exports = { protect, adminOnly, hrOrAdmin, employeeOrAdmin, requireRole, hasAnyRole };

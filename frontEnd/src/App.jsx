@@ -19,6 +19,10 @@ import Register         from './pages/Register';
 import ShiftSettings    from './pages/admin/ShiftSettings';
 
 import UserDashboard    from './pages/user/UserDashboard';
+import MyAttendance     from './pages/user/MyAttendance';
+import Profile          from './pages/user/Profile';
+import HRDashboard      from './pages/hr/HRDashboard';
+import Employees        from './pages/admin/Employees';
 import Notifications    from './pages/Notifications';
 import LeaveManagement  from './pages/LeaveManagement';
 
@@ -26,12 +30,15 @@ export default function App() {
   const { user, loading } = useAuth();
   if (loading) return <Spinner fullScreen />;
 
-  const home = user ? (user.role === 'admin' ? '/admin' : '/me') : '/';
+  const home = user ? (user.role === 'admin' ? '/admin' : user.role === 'hr' ? '/hr' : '/me') : '/';
 
   return (
     <Routes>
       {/* ── Public ──────────────────────────────────────────── */}
-      <Route path="/"        element={user ? <Navigate to={home} replace /> : <HomePage />} />
+      <Route path="/"        element={user ? <Navigate to={home} replace /> : <HomePage page="home" />} />
+      <Route path="/features" element={user ? <Navigate to={home} replace /> : <HomePage page="features" />} />
+      <Route path="/project"  element={user ? <Navigate to={home} replace /> : <HomePage page="project" />} />
+      <Route path="/contact"  element={user ? <Navigate to={home} replace /> : <HomePage page="contact" />} />
       <Route path="/login"   element={user ? <Navigate to={home} replace /> : <Login />} />
       <Route path="/signup"  element={user ? <Navigate to={home} replace /> : <Signup />} />
       <Route path="/register" element={user ? <Navigate to={home} replace /> : <Signup />} />
@@ -52,10 +59,24 @@ export default function App() {
         </Route>
       </Route>
 
+      {/* ── HR ─────────────────────────────────────────────── */}
+      <Route element={<ProtectedRoute role="hr" />}>
+        <Route element={<Layout />}>
+          <Route path="/hr" element={<HRDashboard />} />
+          <Route path="/hr/employees" element={<Employees />} />
+          <Route path="/hr/attendance" element={<AttendanceLog />} />
+          <Route path="/hr/leaves" element={<LeaveManagement />} />
+          <Route path="/hr/reports" element={<AttendanceReports />} />
+          <Route path="/hr/register" element={<Register />} />
+        </Route>
+      </Route>
+
       {/* ── Employee ────────────────────────────────────────── */}
       <Route element={<ProtectedRoute role="employee" />}>
         <Route element={<Layout />}>
           <Route path="/me" element={<UserDashboard />} />
+          <Route path="/me/attendance" element={<MyAttendance />} />
+          <Route path="/me/profile" element={<Profile />} />
           <Route path="/me/notifications" element={<Notifications />} />
           <Route path="/me/leaves" element={<LeaveManagement />} />
         </Route>

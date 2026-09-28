@@ -12,7 +12,7 @@ const labelStyle = { display: 'block', marginBottom: '7px', color: '#94a3b8', fo
 
 export default function Notifications() {
   const { user } = useAuth();
-  return user?.role === 'admin' ? <AdminNotifications /> : <EmployeeNotifications />;
+  return ['admin', 'hr'].includes(user?.role) ? <AdminNotifications /> : <EmployeeNotifications />;
 }
 
 function AdminNotifications() {

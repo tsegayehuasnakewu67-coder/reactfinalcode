@@ -10,7 +10,7 @@ const label = { display: 'block', marginBottom: '6px', color: '#94a3b8', fontSiz
 
 export default function LeaveManagement() {
   const { user } = useAuth();
-  return user?.role === 'admin' ? <AdminLeaves /> : <EmployeeLeaves />;
+  return ['admin', 'hr'].includes(user?.role) ? <AdminLeaves /> : <EmployeeLeaves />;
 }
 
 function EmployeeLeaves() {

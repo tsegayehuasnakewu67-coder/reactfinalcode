@@ -17,6 +17,26 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, [token]);
 
+  useEffect(() => {
+    const clearSession = () => {
+      localStorage.removeItem('sat_token');
+      setToken(null);
+      setUser(null);
+    };
+    const syncStorage = event => {
+      if (event.key !== 'sat_token') return;
+      if (!event.newValue) clearSession();
+      else setToken(event.newValue);
+    };
+
+    window.addEventListener('sat:unauthorized', clearSession);
+    window.addEventListener('storage', syncStorage);
+    return () => {
+      window.removeEventListener('sat:unauthorized', clearSession);
+      window.removeEventListener('storage', syncStorage);
+    };
+  }, []);
+
   const login = useCallback(async (email, password) => {
     const r = await api.post('/auth/login', { email, password });
     const { user: u, token: t } = r.data.data;

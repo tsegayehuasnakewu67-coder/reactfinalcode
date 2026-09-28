@@ -11,6 +11,7 @@
  */
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { authService } from '../services/authService';
 import { loadModels, getDescriptor } from '../utils/faceApi';
 import { Camera, CheckCircle2, UserPlus, ArrowLeft, X, Eye, EyeOff } from 'lucide-react';
@@ -80,6 +81,7 @@ const SECTION_DIVIDER = {
 
 export default function Register() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [form,    setForm]    = useState(INIT);
   const [face,    setFace]    = useState(null);
   const [loading, setLoading] = useState(false);
@@ -147,7 +149,7 @@ export default function Register() {
       const data = await authService.register(payload);
       setSuccess(`Employee "${data.user.fullName}" registered successfully.`);
       setForm(INIT); setFace(null);
-      setTimeout(() => navigate('/admin/users'), 1500);
+      setTimeout(() => navigate(user?.role === 'hr' ? '/hr/employees' : '/admin/users'), 1500);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -198,7 +200,8 @@ export default function Register() {
                   onBlur={e  => { e.target.style.borderColor = '#334155'; e.target.style.boxShadow = 'none'; }}
                 >
                   <option value="employee">Employee</option>
-                  <option value="admin">Admin</option>
+                  {user?.role === 'admin' && <option value="hr">HR</option>}
+                  {user?.role === 'admin' && <option value="admin">Admin</option>}
                 </select>
               </div>
             </TwoCol>

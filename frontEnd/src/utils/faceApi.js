@@ -33,6 +33,25 @@ export const getDescriptor = async (videoEl) => {
   return det ? Array.from(det.descriptor) : null;
 };
 
+const eyeAspectRatio = (points) => {
+  const distance = (a, b) => Math.hypot(points[a].x - points[b].x, points[a].y - points[b].y);
+  return (distance(1, 5) + distance(2, 4)) / (2 * distance(0, 3));
+};
+
+export const getLiveFaceScan = async (videoEl) => {
+  const detection = await faceapi
+    .detectSingleFace(videoEl, new faceapi.TinyFaceDetectorOptions({ inputSize: 224 }))
+    .withFaceLandmarks();
+
+  if (!detection) return null;
+  const landmarks = detection.landmarks;
+  const leftEye = eyeAspectRatio(landmarks.getLeftEye());
+  const rightEye = eyeAspectRatio(landmarks.getRightEye());
+  return {
+    eyeAspectRatio: (leftEye + rightEye) / 2,
+  };
+};
+
 /** Draw face box + landmarks onto an overlay canvas */
 export const drawDetections = async (videoEl, canvasEl) => {
   const dets = await faceapi

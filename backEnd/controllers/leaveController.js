@@ -3,7 +3,7 @@ const User = require('../models/User');
 
 const listLeaves = async (req, res) => {
   try {
-    const filter = req.user.role === 'admin' ? {} : { employee: req.user._id };
+    const filter = ['admin', 'hr'].includes(req.user.role) ? {} : { employee: req.user._id };
     if (req.query.status) filter.status = req.query.status;
     const requests = await LeaveRequest.find(filter)
       .populate('employee', 'fullName employeeId department position')

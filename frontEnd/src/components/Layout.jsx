@@ -18,14 +18,24 @@ const adminNav = [
 
 const employeeNav = [
   { to: '/me', icon: LayoutDashboard, label: 'My Dashboard' },
+  { to: '/me/attendance', icon: ClipboardList, label: 'Attendance History' },
   { to: '/me/notifications', icon: Bell, label: 'My Notifications' },
   { to: '/me/leaves', icon: CalendarDays, label: 'My Leave Requests' },
+  { to: '/me/profile', icon: Users, label: 'Profile' },
+];
+
+const hrNav = [
+  { to: '/hr', icon: LayoutDashboard, label: 'HR Dashboard' },
+  { to: '/hr/employees', icon: Users, label: 'Employee Management' },
+  { to: '/hr/attendance', icon: ClipboardList, label: 'Attendance Monitoring' },
+  { to: '/hr/leaves', icon: CalendarDays, label: 'Leave Management' },
+  { to: '/hr/reports', icon: ClipboardList, label: 'Reports' },
 ];
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const nav      = user?.role === 'admin' ? adminNav : employeeNav;
+  const nav      = user?.role === 'admin' ? adminNav : user?.role === 'hr' ? hrNav : employeeNav;
 
   /* Clicking the logo signs the user out and returns to /login */
   const handleLogoClick = () => {
@@ -92,7 +102,7 @@ export default function Layout() {
             <NavLink
               key={to}
               to={to}
-              end={to === '/admin' || to === '/me'}
+              end={to === '/admin' || to === '/me' || to === '/hr'}
               style={({ isActive }) => ({
                 display: 'flex', alignItems: 'center', gap: '10px',
                 padding: '9px 12px', borderRadius: '10px',

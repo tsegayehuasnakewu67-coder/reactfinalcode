@@ -1,18 +1,93 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
   Building2,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Clock3,
   Mail,
   MapPin,
+  Pause,
   PhoneCall,
+  Play,
   ShieldCheck,
   Sparkles,
   Users,
 } from 'lucide-react';
 
-export default function HomePage() {
+const HOME_PHOTOS = [
+  { src: '/images/gallery-3.jpg', alt: 'University staff member smiling outdoors on campus' },
+  { src: '/images/gallery-1.jpg', alt: 'University colleagues working together at a laptop outdoors' },
+  { src: '/images/gallery-2.jpg', alt: 'University colleagues collaborating outdoors' },
+];
+
+export default function HomePage({ page = 'home' }) {
+  const [activePhoto, setActivePhoto] = useState(0);
+  const [galleryPaused, setGalleryPaused] = useState(false);
+
+  useEffect(() => {
+    if (page !== 'home' || galleryPaused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const timer = window.setInterval(() => {
+      setActivePhoto(current => (current + 1) % HOME_PHOTOS.length);
+    }, 5500);
+    return () => window.clearInterval(timer);
+  }, [page, galleryPaused]);
+
+  const movePhoto = direction => {
+    setActivePhoto(current => (current + direction + HOME_PHOTOS.length) % HOME_PHOTOS.length);
+  };
+
+  const renderPhotoGallery = () => (
+    <div className="visual-stage">
+      <div className="visual-card" role="group" aria-label="Workplace attendance photo gallery">
+        <div className="visual-frame">
+          {HOME_PHOTOS.map((photo, index) => (
+            <img
+              key={photo.src}
+              className={`hero-photo${activePhoto === index ? ' is-active' : ''}`}
+              src={photo.src}
+              alt={activePhoto === index ? photo.alt : ''}
+              aria-hidden={activePhoto !== index}
+            />
+          ))}
+          <div className="visual-overlay" />
+          <div className="hero-logo-center" aria-label="Mekdela Amba University logo">
+            <div className="hero-logo-badge">
+              <img className="hero-logo-image" src="/mau-logo.svg" alt="Mekdela Amba University logo" />
+              <div>
+                <strong>MAU</strong>
+                <small>UNIVERSITY</small>
+              </div>
+            </div>
+          </div>
+          <div className="photo-controls" aria-label="Photo controls">
+            <button type="button" className="photo-control" onClick={() => movePhoto(-1)} aria-label="Previous photo">
+              <ChevronLeft size={18} />
+            </button>
+            <span className="photo-count" aria-live="polite">{activePhoto + 1} / {HOME_PHOTOS.length}</span>
+            <button type="button" className="photo-control" onClick={() => movePhoto(1)} aria-label="Next photo">
+              <ChevronRight size={18} />
+            </button>
+            <button type="button" className="photo-control" onClick={() => setGalleryPaused(value => !value)} aria-label={galleryPaused ? 'Resume automatic photos' : 'Pause automatic photos'}>
+              {galleryPaused ? <Play size={15} /> : <Pause size={15} />}
+            </button>
+          </div>
+          <div className="mini-panel">
+            <div className="mini-panel-top">
+              <span>Attendance Overview</span>
+              <span className="mini-pill">Live</span>
+            </div>
+            <div className="mini-panel-row"><span>Present</span><strong>216</strong></div>
+            <div className="mini-panel-row"><span>Late</span><strong>12</strong></div>
+            <div className="mini-panel-row"><span>On Leave</span><strong>09</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const styles = `
     .home-shell {
       min-height: 100vh;
@@ -156,6 +231,15 @@ export default function HomePage() {
       transform: translateY(-1px);
     }
 
+    .nav-links a.active {
+      color: #f8fafc;
+    }
+
+    .nav-links a.active::after {
+      right: 0;
+      background: #60a5fa;
+    }
+
     .nav-links a::after {
       content: '';
       position: absolute;
@@ -169,6 +253,16 @@ export default function HomePage() {
 
     .nav-links a:hover::after {
       right: 0;
+    }
+
+    .nav-links a:focus-visible,
+    .footer-links a:focus-visible,
+    .contact-card a:focus-visible,
+    .ghost-btn:focus-visible,
+    .primary-btn:focus-visible {
+      outline: 2px solid #facc15;
+      outline-offset: 4px;
+      border-radius: 6px;
     }
 
     .header-actions {
@@ -222,6 +316,11 @@ export default function HomePage() {
     .ghost-btn:hover,
     .primary-btn:hover {
       transform: translateY(-2px);
+    }
+
+    .ghost-btn:active,
+    .primary-btn:active {
+      transform: translateY(0) scale(0.98);
     }
 
     .ghost-btn:hover {
@@ -367,14 +466,79 @@ export default function HomePage() {
       border-radius: 24px;
       min-height: min(660px, 72vh);
       border: 1px solid rgba(148, 163, 184, 0.08);
-      background: url('https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&w=1600&q=85') center/cover no-repeat;
-      animation: campusZoom 12s ease-in-out infinite alternate;
+      background: #0f172a;
+    }
+
+    .hero-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 34%;
+      opacity: 0;
+      transform: scale(1.035);
+      transition: opacity 0.8s ease, transform 6s ease;
+    }
+
+    .hero-photo.is-active {
+      opacity: 1;
+      transform: scale(1);
     }
 
     .visual-overlay {
       position: absolute;
       inset: 0;
+      z-index: 1;
       background: linear-gradient(180deg, rgba(2, 8, 23, 0.05), rgba(2, 8, 23, 0.72));
+    }
+
+    .photo-controls {
+      position: absolute;
+      z-index: 4;
+      top: 18px;
+      right: 18px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px;
+      border: 1px solid rgba(226, 232, 240, 0.2);
+      border-radius: 999px;
+      background: rgba(2, 8, 23, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .photo-control {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      color: #f8fafc;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    }
+
+    .photo-control:hover {
+      color: #facc15;
+      background: rgba(255, 255, 255, 0.12);
+      transform: scale(1.06);
+    }
+
+    .photo-control:focus-visible {
+      outline: 2px solid #facc15;
+      outline-offset: 2px;
+    }
+
+    .photo-count {
+      min-width: 34px;
+      color: #e2e8f0;
+      font-size: 0.72rem;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
     }
 
     .hero-logo-center {
@@ -440,6 +604,7 @@ export default function HomePage() {
 
     .mini-panel {
       position: absolute;
+      z-index: 2;
       left: 26px;
       bottom: 26px;
       width: min(260px, 72%);
@@ -485,6 +650,7 @@ export default function HomePage() {
     .project-section,
     .contact-section {
       margin-top: 100px;
+      scroll-margin-top: 24px;
     }
 
     .section-heading {
@@ -772,6 +938,12 @@ export default function HomePage() {
       color: #facc15;
     }
 
+    .contact-card a:hover {
+      color: #facc15;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
     .footer-copy {
       color: #94a3b8;
       text-align: right;
@@ -942,13 +1114,26 @@ export default function HomePage() {
         min-height: 420px;
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-photo { transition: none; transform: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   `;
 
   return (
     <>
       <style>{styles}</style>
 
-      <div className="home-shell">
+      <div className={`home-shell home-shell--${page}`}>
         <div className="home-inner">
           <header className="home-header">
             <div className="brand-wrap">
@@ -962,10 +1147,10 @@ export default function HomePage() {
             </div>
 
             <nav className="nav-links" aria-label="Main navigation">
-              <a href="#home">Home</a>
-              <a href="#features">Features</a>
-              <a href="#project">Project</a>
-              <a href="#contact">Contact</a>
+              <Link to="/" className={page === 'home' ? 'active' : undefined} aria-current={page === 'home' ? 'page' : undefined}>Home</Link>
+              <Link to="/features" className={page === 'features' ? 'active' : undefined} aria-current={page === 'features' ? 'page' : undefined}>Features</Link>
+              <Link to="/project" className={page === 'project' ? 'active' : undefined} aria-current={page === 'project' ? 'page' : undefined}>Project</Link>
+              <Link to="/contact" className={page === 'contact' ? 'active' : undefined} aria-current={page === 'contact' ? 'page' : undefined}>Contact</Link>
             </nav>
 
             <div className="header-actions">
@@ -974,7 +1159,7 @@ export default function HomePage() {
             </div>
           </header>
 
-          <main className="hero" id="home">
+          {page === 'home' && <main className="hero" id="home">
             <div className="hero-content">
               <span className="eyebrow">
                 <Sparkles size={12} /> MEKDELA AMBA UNIVERSITY
@@ -1013,43 +1198,10 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="visual-stage">
-              <div className="visual-card" aria-label="Workplace attendance overview">
-                <div className="visual-frame">
-                  <div className="visual-overlay" />
-                  <div className="hero-logo-center" aria-label="Mekdela Amba University logo">
-                    <div className="hero-logo-badge">
-                      <img className="hero-logo-image" src="/mau-logo.svg" alt="Mekdela Amba University logo" />
-                      <div>
-                        <strong>MAU</strong>
-                        <small>UNIVERSITY</small>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mini-panel">
-                    <div className="mini-panel-top">
-                      <span>Attendance Overview</span>
-                      <span className="mini-pill">Live</span>
-                    </div>
-                    <div className="mini-panel-row">
-                      <span>Present</span>
-                      <strong>216</strong>
-                    </div>
-                    <div className="mini-panel-row">
-                      <span>Late</span>
-                      <strong>12</strong>
-                    </div>
-                    <div className="mini-panel-row">
-                      <span>On Leave</span>
-                      <strong>09</strong>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </main>
+            {renderPhotoGallery()}
+          </main>}
 
-          <section className="feature-section" id="features">
+          {page === 'features' && <section className="feature-section" id="features">
             <div className="section-heading">
               <h3>Built for operational clarity</h3>
               <p>
@@ -1091,9 +1243,9 @@ export default function HomePage() {
                 <p>Download attendance records in Excel or PDF and generate recognition or completion certificates.</p>
               </article>
             </div>
-          </section>
+          </section>}
 
-          <section className="project-section" id="project">
+          {page === 'project' && <section className="project-section" id="project">
             <div className="section-heading">
               <h3>About the project</h3>
             </div>
@@ -1121,9 +1273,9 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-          </section>
+          </section>}
 
-          <section className="contact-section" id="contact">
+          {page === 'contact' && <section className="contact-section" id="contact">
             <div className="section-heading">
               <h3>Contact us</h3>
             </div>
@@ -1142,7 +1294,7 @@ export default function HomePage() {
                   <PhoneCall size={22} />
                 </div>
                 <h4>Phone</h4>
-                <p>+251995207802</p>
+                  <a href="tel:+251995207802">+251995207802</a>
               </div>
 
               <div className="contact-card">
@@ -1153,7 +1305,7 @@ export default function HomePage() {
                 <p>Bahir Dar Gemba, Ethiopia</p>
               </div>
             </div>
-          </section>
+          </section>}
 
           <footer className="site-footer">
             <div className="footer-inner">
@@ -1170,10 +1322,10 @@ export default function HomePage() {
               </div>
 
               <div className="footer-links">
-                <a href="#home">Home</a>
-                <a href="#features">Features</a>
-                <a href="#project">Project</a>
-                <a href="#contact">Contact</a>
+                <Link to="/">Home</Link>
+                <Link to="/features">Features</Link>
+                <Link to="/project">Project</Link>
+                <Link to="/contact">Contact</Link>
               </div>
 
               <div className="footer-copy">

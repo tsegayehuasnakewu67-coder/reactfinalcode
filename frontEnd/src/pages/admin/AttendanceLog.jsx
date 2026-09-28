@@ -103,25 +103,25 @@ export default function AttendanceLog() {
                         : '—'}
                     </td>
                     <td style={styles.td}>
-                      {r.checkOutTime
-                        ? <span style={{ color: '#f59e0b', fontVariantNumeric: 'tabular-nums' }}>
+                        {r.checkOutTime
+                        ? <span style={{ color: '#fbbf24', fontVariantNumeric: 'tabular-nums' }}>
                             {new Date(r.checkOutTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                           </span>
-                        : <span style={{ color: '#475569' }}>—</span>}
+                        : <span style={{ color: '#64748b' }}>—</span>}
                     </td>
                     <td style={styles.td}>
                       {r.afterLunchCheckIn
                         ? <span style={{ color: '#60a5fa', fontVariantNumeric: 'tabular-nums' }}>
                             {new Date(r.afterLunchCheckIn).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                           </span>
-                        : <span style={{ color: '#475569' }}>—</span>}
+                        : <span style={{ color: '#64748b' }}>—</span>}
                     </td>
                     <td style={styles.td}>
                       {r.afterLunchCheckOut
-                        ? <span style={{ color: '#a78bfa', fontVariantNumeric: 'tabular-nums' }}>
+                        ? <span style={{ color: '#c4b5fd', fontVariantNumeric: 'tabular-nums' }}>
                             {new Date(r.afterLunchCheckOut).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                           </span>
-                        : <span style={{ color: '#475569' }}>—</span>}
+                        : <span style={{ color: '#64748b' }}>—</span>}
                     </td>
                     <td style={styles.td}><StatusBadge status={r.status} /></td>
                     <td style={styles.td}>
@@ -151,55 +151,59 @@ export default function AttendanceLog() {
 function FilterField({ label, name, value, onChange, type = 'text' }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <label style={{ fontSize: 11, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.4px' }}>{label}</label>
+      <label style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4px' }}>{label}</label>
       <input type={type} name={name} value={value} onChange={onChange}
-        style={{ padding: '7px 10px', border: '1px solid #e2e8f0', borderRadius: 6, fontSize: 13, outline: 'none' }} />
+        style={styles.filterInput} />
     </div>
   );
 }
 
 function StatusBadge({ status }) {
-  const map = { Present: ['#dcfce7','#16a34a'], Late: ['#fef9c3','#ca8a04'], Absent: ['#fee2e2','#dc2626'] };
-  const [bg, fg] = map[status] ?? ['#f1f5f9','#64748b'];
+  const map = {
+    Present: ['rgba(21,128,61,.2)', '#4ade80'],
+    Late: ['rgba(180,83,9,.2)', '#fbbf24'],
+    Absent: ['rgba(185,28,28,.2)', '#f87171'],
+  };
+  const [bg, fg] = map[status] ?? ['#1e293b','#94a3b8'];
   return <span style={{ background: bg, color: fg, borderRadius: 20, padding: '2px 8px', fontSize: 11, fontWeight: 600 }}>{status}</span>;
 }
 
 function ConfidenceBar({ value }) {
   // Lower distance = better match. 0.6 is the threshold.
   const pct = Math.max(0, Math.round((1 - value / 0.6) * 100));
-  const color = pct >= 70 ? '#22c55e' : pct >= 40 ? '#f59e0b' : '#ef4444';
+  const color = pct >= 70 ? '#4ade80' : pct >= 40 ? '#fbbf24' : '#f87171';
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-      <div style={{ width: 50, height: 6, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
+      <div style={{ width: 50, height: 6, background: '#334155', borderRadius: 3, overflow: 'hidden' }}>
         <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 3 }} />
       </div>
-      <span style={{ fontSize: 11, color: '#64748b' }}>{value.toFixed(3)}</span>
+      <span style={{ fontSize: 11, color: '#94a3b8' }}>{value.toFixed(3)}</span>
     </div>
   );
 }
 
 const styles = {
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
-  pageTitle: { margin: '0 0 4px', fontSize: 22, fontWeight: 700, color: '#0f172a' },
+  pageTitle: { margin: '0 0 4px', fontSize: 22, fontWeight: 700, color: '#f8fafc' },
   pageSub: { margin: 0, color: '#64748b', fontSize: 13 },
-  filterCard: { background: '#fff', borderRadius: 12, padding: '18px 20px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.07)' },
+  filterCard: { background: '#0f172a', border: '1px solid #1e293b', borderRadius: 12, padding: '18px 20px', marginBottom: 16 },
   filterGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px 16px', marginBottom: 14 },
   fieldWrap: { display: 'flex', flexDirection: 'column', gap: 4 },
-  filterLabel: { fontSize: 11, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.4px' },
-  filterInput: { padding: '7px 10px', border: '1px solid #e2e8f0', borderRadius: 6, fontSize: 13, background: '#fff' },
+  filterLabel: { fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4px' },
+  filterInput: { width: '100%', boxSizing: 'border-box', padding: '9px 12px', border: '1px solid #334155', borderRadius: 9, fontSize: 13, background: '#1e293b', color: '#e2e8f0', colorScheme: 'dark' },
   filterActions: { display: 'flex', gap: 10 },
   applyBtn: { background: '#3b82f6', color: '#fff', border: 'none', borderRadius: 7, padding: '7px 18px', fontSize: 13, fontWeight: 600, cursor: 'pointer' },
-  clearBtn: { background: '#f1f5f9', border: 'none', borderRadius: 7, padding: '7px 14px', fontSize: 13, cursor: 'pointer', color: '#475569' },
-  error: { background: '#fef2f2', color: '#dc2626', padding: '10px 14px', borderRadius: 8, marginBottom: 12 },
-  tableWrap: { background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.07)' },
+  clearBtn: { background: '#1e293b', border: '1px solid #334155', borderRadius: 7, padding: '7px 14px', fontSize: 13, cursor: 'pointer', color: '#cbd5e1' },
+  error: { background: 'rgba(185,28,28,.2)', color: '#fca5a5', border: '1px solid #7f1d1d', padding: '10px 14px', borderRadius: 8, marginBottom: 12 },
+  tableWrap: { background: '#0f172a', border: '1px solid #1e293b', borderRadius: 12, overflowX: 'auto', boxShadow: '0 4px 24px rgba(0,0,0,0.25)' },
   table: { width: '100%', borderCollapse: 'collapse' },
-  th: { padding: '11px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#64748b', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' },
-  tr: { borderBottom: '1px solid #f1f5f9' },
-  td: { padding: '11px 14px', fontSize: 13, color: '#334155', verticalAlign: 'middle' },
-  empId: { background: '#f1f5f9', padding: '2px 6px', borderRadius: 4, fontSize: 11, fontFamily: 'monospace' },
-  smallText: { color: '#64748b', fontSize: 12 },
-  empty: { textAlign: 'center', padding: 32, color: '#94a3b8', fontSize: 14 },
+  th: { padding: '11px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#94a3b8', background: '#1e293b', borderBottom: '1px solid #334155', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' },
+  tr: { borderBottom: '1px solid rgba(30,41,59,.7)' },
+  td: { padding: '11px 14px', fontSize: 13, color: '#cbd5e1', verticalAlign: 'middle' },
+  empId: { background: '#1e293b', color: '#93c5fd', padding: '2px 6px', borderRadius: 4, fontSize: 11, fontFamily: 'monospace' },
+  smallText: { color: '#94a3b8', fontSize: 12 },
+  empty: { textAlign: 'center', padding: 32, color: '#64748b', fontSize: 14 },
   pagination: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginTop: 16 },
-  pageBtn: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: 6, padding: '6px 14px', fontSize: 13, cursor: 'pointer' },
-  pageInfo: { fontSize: 13, color: '#64748b' },
+  pageBtn: { background: '#1e293b', border: '1px solid #334155', color: '#cbd5e1', borderRadius: 6, padding: '6px 14px', fontSize: 13, cursor: 'pointer' },
+  pageInfo: { fontSize: 13, color: '#94a3b8' },
 };
